@@ -1,0 +1,22 @@
+===========================
+ RELATÓRIO METEOROLÓGICO
+===========================
+
+Estação: RIO DO CAMPO
+Código WMO: A861
+Região: S
+UF: SC
+Latitude: -26.93749999
+Longitude: -50.14555555
+Altitude: 591.67 m
+
+Total de registros: 8784
+
+---------------------------
+Estatísticas:
+---------------------------
+Temperatura média: 17.74 °C
+Umidade máxima: 100.00 %
+Precipitação total: 1441.60 mm
+---------------------------
+Fim do relatório.
