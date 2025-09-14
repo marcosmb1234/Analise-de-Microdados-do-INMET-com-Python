@@ -31,7 +31,6 @@ def carregar_dados_pasta(caminho_base: str, ano: str) -> List[EstacaoMeteorologi
             with open(arquivo, mode='r', encoding='latin-1', newline='') as f:
                 linhas_cabecalho = [next(f) for _ in range(8)]
 
-                # Cabeçalho
                 regiao = linhas_cabecalho[0].split(';')[1].strip()
                 uf = linhas_cabecalho[1].split(';')[1].strip()
                 nome_estacao = linhas_cabecalho[2].split(';')[1].strip()
@@ -52,8 +51,7 @@ def carregar_dados_pasta(caminho_base: str, ano: str) -> List[EstacaoMeteorologi
                 leitor_csv = csv.reader(f, delimiter=';')
 
                 for linha in leitor_csv:
-                    # LIMPEZA E CONVERSÃO DOS DADOS DE CADA LINHA
-                    # Os dados vêm como texto, precisamos convertê-los para números.
+                    # Os dados vêm como texto e precisamos convertê-los para números.
                     data = linha[0]
                     hora = linha[1]
 

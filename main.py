@@ -1,6 +1,7 @@
 import leitor
-import csv
 from modelos.estatisticas import Estatisticas
+from datetime import datetime
+
 
 def carregar_dados():
     """
@@ -24,14 +25,10 @@ def exibir_estacoes(lista_estacoes):
     """
     Função dedicada a exibir os detalhes de todas as estações carregadas.
     """
-    if not lista_estacoes:
-        print("\nERRO: Você precisa carregar os dados primeiro (Opção 1).")
-        return 
-
     print("\n--- Detalhes das Estações Carregadas ---")
     for estacao in lista_estacoes:
         print(estacao) 
-
+        registros = estacao.obter_registros()
         if registros:
             print("    - Primeiros 5 registros:")
             for registro in registros[:5]:
@@ -45,9 +42,6 @@ def exibir_estatisticas(lista_estacoes):
     """
     Função dedicada a exibir as estatísticas de uma estação escolhida pelo usuário.
     """
-    if not lista_estacoes:
-        print("\nERRO: Você precisa carregar os dados primeiro (Opção 1).")
-        return
 
     print("\n--- Escolha uma Estação para ver as Estatísticas ---")
     for i, estacao in enumerate(lista_estacoes):
@@ -55,14 +49,11 @@ def exibir_estatisticas(lista_estacoes):
 
     try:
         escolha = int(input("\nDigite o número da estação: "))
-        estacao_selecionada = lista_estacoes[escolha - 1]
+        estacao = lista_estacoes[escolha - 1]
+        stats = Estatisticas(estacao.obter_registros())
 
-        stats = Estatisticas(estacao_selecionada.obter_registros())
-
-        print(f"\n--- Estatísticas para a Estação: {estacao_selecionada.nome} ---")
-        print(f"Temperatura Média: {stats.media_temperatura():.2f}°C")
-        print(f"Umidade Máxima: {stats.max_umidade():.1f}%")
-        print(f"Precipitação Total no Período: {stats.total_precipitacao():.2f}mm")
+        print(f"\n--- Estatísticas para a Estação: {estacao.nome} ---")
+        print(stats)
         print("-" * 55)
 
     except (ValueError, IndexError):
@@ -73,9 +64,6 @@ def filtrar_dados_por_data(lista_estacoes):
     """
     Permite ao usuário escolher uma estação e filtrar seus registros por um período de datas.
     """
-    if not lista_estacoes:
-        print("\nERRO: Você precisa carregar os dados primeiro (Opção 1).")
-        return
 
     print("\n--- Escolha uma Estação para Filtrar os Dados ---")
     for i, estacao in enumerate(lista_estacoes):
@@ -83,23 +71,22 @@ def filtrar_dados_por_data(lista_estacoes):
 
     try:
         escolha = int(input("\nDigite o número da estação: "))
-        estacao_selecionada = lista_estacoes[escolha - 1]
+        estacao = lista_estacoes[escolha - 1]
 
         data_inicio = input("Digite a data de início (formato AAAA/MM/DD): ")
         data_fim = input("Digite a data de fim (formato AAAA/MM/DD): ")
-
-        if len(data_inicio) != 10 or len(data_fim) != 10 or data_inicio[4] != '/' or data_fim[4] != '/':
-            print("ERRO: Formato de data inválido. Use AAAA/MM/DD e tente novamente.")
-            return
+        data_inicio_dt = datetime.strptime(data_inicio, "%Y/%m/%d")
+        data_fim_dt = datetime.strptime(data_fim, "%Y/%m/%d")
 
         registros_filtrados = []
-        todos_os_registros = estacao_selecionada.obter_registros()
+        todos_os_registros = estacao.obter_registros()
 
         for registro in todos_os_registros:
-            if registro.data and (data_inicio <= registro.data <= data_fim):
+            registro_data_dt = datetime.strptime(registro.data, "%Y/%m/%d")
+            if data_inicio_dt <= registro_data_dt <= data_fim_dt:
                 registros_filtrados.append(registro)
 
-        print(f"\n--- Registros para '{estacao_selecionada.nome}' entre {data_inicio} e {data_fim} ---")
+        print(f"\n--- Registros para '{estacao.nome}' entre {data_inicio} e {data_fim} ---")
 
         if not registros_filtrados:
             print("Nenhum registro encontrado para este período.")
@@ -109,17 +96,17 @@ def filtrar_dados_por_data(lista_estacoes):
             print(f"\nTotal de {len(registros_filtrados)} registros encontrados.")
         print("-" * 55)
 
-    except (ValueError, IndexError):
+    except (IndexError):
         print("ERRO: Escolha inválida. Por favor, digite um número da lista.")
+    except ValueError:
+        print("ERRO: Formato de data inválido. Use AAAA/MM/DD e tente novamente.")
+
 
 def exportar_relatorio(lista_estacoes):
     """
     Permite ao usuário escolher uma estação e exportar um relatório completo em .txt,
     contendo dados da estação, estatísticas e todos os registros.
     """
-    if not lista_estacoes:
-        print("\nERRO: Você precisa carregar os dados primeiro (Opção 1).")
-        return
 
     print("\n--- Escolha uma Estação para Exportar o Relatório ---")
     for i, estacao in enumerate(lista_estacoes):
@@ -127,19 +114,14 @@ def exportar_relatorio(lista_estacoes):
 
     try:
         escolha = int(input("\nDigite o número da estação: "))
-        estacao_selecionada = lista_estacoes[escolha - 1]
+        estacao = lista_estacoes[escolha - 1]
 
-        registros = estacao_selecionada.obter_registros()
+        registros = estacao.obter_registros()
         if not registros:
             print("ERRO: Esta estação não possui registros para exportar.")
             return
 
-        from modelos.estatisticas import Estatisticas
         stats = Estatisticas(registros)
-
-        temp_media = stats.media_temperatura()
-        umid_max = stats.max_umidade()
-        precip_total = stats.total_precipitacao()
 
         if registros:
             data_inicio = registros[0].data
@@ -153,27 +135,25 @@ def exportar_relatorio(lista_estacoes):
             nome_arquivo += '.txt'
 
         linhas_dados = ""
-        for reg in registros:
+        for reg in registros[:50]:
             linhas_dados += f"{reg.data:10} {reg.hora:6} {reg.temperatura!s:9} {reg.umidade!s:8} {reg.precipitacao!s:12}\n"
 
         relatorio = (
             "===========================\n"
             " RELATÓRIO METEOROLÓGICO\n"
-            "===========================\n\n"
-            f"Estação: {estacao_selecionada.nome}\n"
-            f"Código WMO: {estacao_selecionada.codigo}\n"
-            f"Região: {estacao_selecionada.regiao}\n"
-            f"UF: {estacao_selecionada.uf}\n"
-            f"Latitude: {estacao_selecionada.latitude}\n"
-            f"Longitude: {estacao_selecionada.longitude}\n"
-            f"Altitude: {estacao_selecionada.altitude} m\n\n"
-            f"Total de registros: {len(registros)}\n\n"
+            "===========================\n"
+            "---------------------------\n"
+            "Dados da Estação:\n"
+            "---------------------------\n"
+            f"{estacao}"
             "---------------------------\n"
             "Estatísticas:\n"
             "---------------------------\n"
-            f"Temperatura média: {temp_media:.2f} °C\n"
-            f"Umidade máxima: {umid_max:.2f} %\n"
-            f"Precipitação total: {precip_total:.2f} mm\n"
+            f"{stats}"
+            "---------------------------\n"
+            "Registros:\n"
+            "---------------------------\n"
+            f"{linhas_dados}"
             "---------------------------\n"
             "Fim do relatório.\n"
         )

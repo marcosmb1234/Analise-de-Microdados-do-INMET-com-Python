@@ -24,6 +24,12 @@ class EstacaoMeteorologica:
 
     def __str__(self) -> str:
         return (
-            f"Estação {self.nome} ({self.codigo}) - {self.uf}/{self.regiao} | "
-            f"{len(self.registros)} registros carregados."
+            f"Estação: {self.nome}\n"
+            f"Código WMO: {self.codigo}\n"
+            f"Região: {self.regiao}\n"
+            f"UF: {self.uf}\n"
+            f"Latitude: {self.latitude}\n"
+            f"Longitude: {self.longitude}\n"
+            f"Altitude: {self.altitude} m\n\n"
+            f"Total de registros: {len(self.registros)}\n"
         )

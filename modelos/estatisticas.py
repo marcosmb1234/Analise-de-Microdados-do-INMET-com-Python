@@ -24,3 +24,7 @@ class Estatisticas:
         if not precipitacoes:
             return 0.0
         return sum(precipitacoes)
+    def __str__(self) -> str:
+        return (f"Média Temp: {self.media_temperatura():.2f}°C | \n"
+                f"Máx Umidade: {self.max_umidade():.2f}% | \n"
+                f"Total Precipitação: {self.total_precipitacao():.2f}mm\n\n")
