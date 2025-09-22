@@ -40,26 +40,31 @@ def exibir_estacoes(lista_estacoes):
 
 def exibir_estatisticas(lista_estacoes):
     """
-    Função dedicada a exibir as estatísticas de uma estação escolhida pelo usuário.
+    Função dedicada a exibir as estatísticas de TODAS as estações carregadas.
     """
+    if not lista_estacoes:
+        print("\nERRO: Você precisa carregar os dados primeiro (Opção 1).")
+        return
 
-    print("\n--- Escolha uma Estação para ver as Estatísticas ---")
-    for i, estacao in enumerate(lista_estacoes):
-        print(f"{i + 1}. {estacao.nome} ({estacao.codigo})")
+    print("\n--- Estatísticas de Todas as Estações Carregadas ---")
 
-    try:
-        escolha = int(input("\nDigite o número da estação: "))
-        estacao = lista_estacoes[escolha - 1]
-        stats = Estatisticas(estacao.obter_registros())
+    # Loop que passa por cada estação na lista
+    for estacao in lista_estacoes:
+        registros = estacao.obter_registros()
 
-        print(f"\n--- Estatísticas para a Estação: {estacao.nome} ---")
-        print(stats)
-        print("-" * 55)
+        # Imprime o nome da estação como um título
+        print(f"\n>> Estação: {estacao.nome} ({estacao.codigo})")
 
-    except (ValueError, IndexError):
-        print("ERRO: Escolha inválida. Por favor, digite um número da lista.")
+        if not registros:
+            print("   - Esta estação não possui registros para análise.")
+        else:
+            # Cria o objeto de estatísticas para a estação atual
+            stats = Estatisticas(registros)
+            # Imprime as estatísticas formatadas (graças ao método __str__ da classe Estatisticas)
+            print(stats)
 
-
+    print("\n" + "=" * 55)  # Linha para marcar o fim do relatório
+    
 def filtrar_dados_por_data(lista_estacoes):
     """
     Permite ao usuário escolher uma estação e filtrar seus registros por um período de datas.
