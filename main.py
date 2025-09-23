@@ -9,7 +9,7 @@ def carregar_dados():
     Pede ao usuário a pasta e o ano, e chama o leitor.
     """
     print("\n--- Carregando Dados das Estações ---")
-    pasta = input("Digite o nome da pasta base (ex: dados_estacoes): ")
+    pasta = input("Digite o nome da pasta base (ex: dados): ")
     ano = input("Digite o ano que deseja analisar (ex: 2024): ")
 
     dados = leitor.carregar_dados_pasta(pasta, ano)
